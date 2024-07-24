@@ -25,7 +25,7 @@ Em um sistema de agente autônomo alimentado por LLM, o LLM funciona como o cér
     ####
   - O agente aprende a chamar APIs externas para obter informações extras que estão faltando nos pesos do modelo (muitas vezes difíceis de alterar após o pré-treinamento), incluindo informações atuais, capacidade de execução de código, acesso a fontes de informações proprietárias e muito mais.
 
-<img src = 'imagem1.png'>
+<img src = 'image1.png'>
 
 ## Component One: Planning (Primeiro componente: Planejamento)
 
