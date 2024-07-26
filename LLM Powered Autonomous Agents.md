@@ -4,7 +4,7 @@ Sumário - Falta fazer
 
 Construir agentes com LLM (grande modelo de linguagem) como controlador principal é um conceito interessante. Existem várias demonstrações de prova de conceito, como AutoGPT, GPT-Engineer e BabyAGI, que servem como exemplos inspiradores. A potencialidade do LLM vai além da boa geração de cópias, histórias, ensaios e programas; pode ser enquadrado como um poderoso solucionador de problemas gerais.
 
-## Agent System Overview (Visão geral do sistema do agente)
+## Visão geral do sistema do agente
 
 Em um sistema de agente autônomo alimentado por LLM, o LLM funciona como o cérebro do agente, complementado por vários componentes chave: 
 
@@ -27,7 +27,7 @@ Em um sistema de agente autônomo alimentado por LLM, o LLM funciona como o cér
 
 <img src = 'image1.png'>
 
-## Component One: Planning (Primeiro componente: Planejamento)
+## Primeiro componente: Planejamento
 
 Uma tarefa complicada geralmente envolve muitas etapas. Um agente precisa saber o que são e planejar com antecedência.
 
@@ -74,7 +74,7 @@ A auto-reflexão é criada mostrando exemplos de duas etapas ao LLM, e cada exem
 
 Fig. 4. Experimentos no AlfWorld Env e HotpotQA. Alucinação é uma falha mais comum do que o planejamento ineficiente no AlfWorld. (Fonte da imagem: [Shinn & Labash, 2023](https://arxiv.org/abs/2303.11366))
 
-Cadeia de Reflexão (CoH; [Liu et al. 2023](https://arxiv.org/abs/2302.02676)) incentiva o modelo a melhorar suas próprias saídas apresentando-lhe explicitamente uma sequência de saídas passadas, cada uma anotada com feedback. Os dados de feedback humano são uma coleção de \( \{(x, y_i, r_i, f_i)\} \), onde \( x \) é o prompt, cada \( y_i \) é uma conclusão do modelo, \( r_i \) é a avaliação humana de \( y_i \), e \( f_i \) é o feedback correspondente fornecido pelo humano. Assume-se que as tuplas de feedback são classificadas por recompensa, \( r \). O processo é um ajuste fino supervisionado, onde os dados são uma sequência na forma de \( (x, y_1, r_1, f_1, \ldots, y_n, r_n, f_n) \), onde \( y_i \). O modelo é ajustado para prever apenas \( y_i \) condicionado ao prefixo da sequência, de modo que o modelo possa auto-refletir para produzir uma saída melhor com base na sequência de feedback. O modelo pode opcionalmente receber várias rodadas de instruções com anotadores humanos no momento do teste.
+Cadeia de Reflexão (CoH; [Liu et al. 2023](https://arxiv.org/abs/2302.02676)) incentiva o modelo a melhorar suas próprias saídas apresentando-lhe explicitamente uma sequência de saídas passadas, cada uma anotada com feedback. Os dados de feedback humano são uma coleção de ( \{(x, y_i, r_i, f_i)\} \), onde \( x \) é o prompt, cada \( y_i \) é uma conclusão do modelo, \( r_i \) é a avaliação humana de \( y_i \), e \( f_i \) é o feedback correspondente fornecido pelo humano. Assume-se que as tuplas de feedback são classificadas por recompensa, \( r \). O processo é um ajuste fino supervisionado, onde os dados são uma sequência na forma de \( (x, y_1, r_1, f_1, \ldots, y_n, r_n, f_n) \), onde \( y_i \). O modelo é ajustado para prever apenas \( y_i \) condicionado ao prefixo da sequência, de modo que o modelo possa auto-refletir para produzir uma saída melhor com base na sequência de feedback. O modelo pode opcionalmente receber várias rodadas de instruções com anotadores humanos no momento do teste.
 
 Para evitar overfitting, o CoH adiciona um termo de regularização para maximizar a verossimilhança do conjunto de dados de pré-treinamento. Para evitar atalhos e cópias (porque há muitas palavras comuns nas sequências de feedback), eles mascaram aleatoriamente de 0% a 5% dos tokens passados durante o treinamento.
 
@@ -99,4 +99,34 @@ Em comparação com três linhas de base, incluindo ED (destilação de especial
 <img src = 'image7.png'>
 
 Fig. 7. Comparação entre AD, ED, política-fonte e RL^2 em ambientes que requerem memória e exploração. Apenas uma recompensa binária é atribuída. As políticas-fonte são treinadas com [A3C](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/#a3c) para ambientes "escuros" e [DQN](http://lilianweng.github.io/posts/2018-02-19-rl-overview/#deep-q-network) para o labirinto aquático.(Fonte da imagem: [Laskin et al. 2023](https://arxiv.org/abs/2210.14215))
+
+## Componente Dois: Memória
+
+(Muito obrigado ao ChatGPT por me ajudar a redigir esta seção. Aprendi muito sobre o cérebro humano e a estrutura de dados para MIPS rápidos em minhas [conversas](https://chat.openai.com/share/46ff149e-a4c7-4dd7-a800-fc4a642ea389) com o ChatGPT.)
+
+### Tipos de Memória
+
+A memória pode ser definida como os processos usados para adquirir, armazenar, reter e posteriormente recuperar informações. Existem vários tipos de memória no cérebro humano.
+
+**Memória Sensorial**: Este é o estágio mais inicial da memória, proporcionando a capacidade de reter impressões de informações sensoriais (visuais, auditivas, etc.) após o estímulo original ter terminado. A memória sensorial geralmente dura apenas alguns segundos. As subcategorias incluem memória icônica (visual), memória ecoica (auditiva) e memória háptica (tato).
+
+**Memória de Curto Prazo** (MCP) ou **Memória de Trabalho**: Armazena informações das quais estamos atualmente conscientes e é necessária para realizar tarefas cognitivas complexas, como aprender e raciocinar. Acredita-se que a memória de curto prazo tenha uma capacidade de cerca de 7 itens ([Miller 1956](https://lilianweng.github.io/posts/2023-06-23-agent/psychclassics.yorku.ca/Miller/)) e dura de 20 a 30 segundos.
+
+**Memória de Longo Prazo** (MLP): A memória de longo prazo pode armazenar informações por um tempo notavelmente longo, variando de alguns dias a décadas, com uma capacidade de armazenamento essencialmente ilimitada. Existem dois subtipos de MLP:
+
+Memória Explícita / Declarativa: Esta é a memória de fatos e eventos e refere-se àquelas memórias que podem ser conscientemente recuperadas, incluindo a memória epidódica (eventos e experiências) e a memória semântica (fatos e conceitos).
+
+Memória Implícita / Procedural: Este tipo de memória é inconsciente e envolve habilidades e rotinas que são realizadas automaticamente, como andar de bicicleta ou digitar em um teclado.
+
+<img src = 'image8.png'>
+
+Fig. 8. Categorização da memória humana.
+
+Podemos considerar aproximadamente os seguintes mapeamentos:
+
+- Memória sensorial como a representação de embeddings de aprendizado para entradas brutas, incluindo texto, imagem ou outras modalidades;
+- Memória de curto prazo como aprendizado em contexto. Ela é curta e finita, pois é restrita pelo comprimento do contexto finito da janela do Transformer.
+- Memória de longo prazo como o armazenamento externo de vetores que o agente pode acessar no momento da consulta, acessível via recuperação rápida.
+
+### Pesquisa de Máximo Produto Interno (MIPS)
 
