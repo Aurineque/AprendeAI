@@ -74,7 +74,7 @@ A auto-reflexão é criada mostrando exemplos de duas etapas ao LLM, e cada exem
 
 Fig. 4. Experimentos no AlfWorld Env e HotpotQA. Alucinação é uma falha mais comum do que o planejamento ineficiente no AlfWorld. (Fonte da imagem: [Shinn & Labash, 2023](https://arxiv.org/abs/2303.11366))
 
-Cadeia de Reflexão (CoH; [Liu et al. 2023](https://arxiv.org/abs/2302.02676)) incentiva o modelo a melhorar suas próprias saídas apresentando-lhe explicitamente uma sequência de saídas passadas, cada uma anotada com feedback. Os dados de feedback humano são uma coleção de\( D_h  = \{(x , y_i , r_i , z_i )\}\ n_i = 1  \), onde \( x \) é o prompt, cada \( y_i \) é uma conclusão do modelo, \( r_i \) é a avaliação humana de \( y_i \), e \( z_i \) é o feedback correspondente fornecido pelo humano. Assume-se que as tuplas de feedback são classificadas por recompensa, $r_n \geq r_n-1 \geq \cdots \geq r_1$. O processo é um ajuste fino supervisionado, onde os dados são uma sequência na forma de \( th = (x, z_i, y_i, z_j,y_j \ldots, z_n, y_n) \), onde $ \leq i \leq j \leq n$. O modelo é ajustado para prever apenas \( y_n \) condicionado ao prefixo da sequência, de modo que o modelo possa auto-refletir para produzir uma saída melhor com base na sequência de feedback. O modelo pode opcionalmente receber várias rodadas de instruções com anotadores humanos no momento do teste.
+Cadeia de Reflexão (CoH; [Liu et al. 2023](https://arxiv.org/abs/2302.02676)) incentiva o modelo a melhorar suas próprias saídas apresentando-lhe explicitamente uma sequência de saídas passadas, cada uma anotada com feedback. Os dados de feedback humano são uma coleção de \( D_h = \{(x , y_i , r_i , z_i )\}\stackrel{n}{i} = 1  \), onde \( x \) é o prompt, cada \( y_i \) é uma conclusão do modelo, \( r_i \) é a avaliação humana de \( y_i \), e \( z_i \) é o feedback correspondente fornecido pelo humano. Assume-se que as tuplas de feedback são classificadas por recompensa, $r_n \geq r\underset{n-1}{} \geq \cdots \geq r_1$. O processo é um ajuste fino supervisionado, onde os dados são uma sequência na forma de \( th = (x, z_i, y_i, z_j,y_j \ldots, z_n, y_n) \), onde $ \leq i \leq j \leq n$. O modelo é ajustado para prever apenas \( y_n \) condicionado ao prefixo da sequência, de modo que o modelo possa auto-refletir para produzir uma saída melhor com base na sequência de feedback. O modelo pode opcionalmente receber várias rodadas de instruções com anotadores humanos no momento do teste.
 
 Para evitar overfitting, o CoH adiciona um termo de regularização para maximizar a verossimilhança do conjunto de dados de pré-treinamento. Para evitar atalhos e cópias (porque há muitas palavras comuns nas sequências de feedback), eles mascaram aleatoriamente de 0% à 5% dos tokens passados durante o treinamento.
 
@@ -120,6 +120,7 @@ Memória Implícita / Procedural: Este tipo de memória é inconsciente e envolv
 
 <img src = 'image8.png'>
 
+
 Fig. 8. Categorização da memória humana.
 
 Podemos considerar aproximadamente os seguintes mapeamentos:
@@ -130,5 +131,20 @@ Podemos considerar aproximadamente os seguintes mapeamentos:
 
 ### Pesquisa de Máximo Produto Interno (MIPS)
 
+A memória externa pode aliviar a restrição do tempo de atenção finito. Uma prática comum é salvar a representação em embedding da informação em um banco de dados de vetores que pode suportar uma busca rápida por produto interno máximo ([MIPS](https://en.wikipedia.org/wiki/Maximum_inner-product_searc)). Para otimizar a velocidade de recuperação, a escolha comum é o algoritmo de vizinhos mais próximos aproximados (ANN) para retornar aproximadamente os k vizinhos mais próximos, trocando um pouco de precisão por um grande aumento de velocidade.
 
-Human feedback data is a collection of $(x, y_i, r_i, z_i)$, where $x$ is the prompt, each $y_i$ is a model completion, $r_i$ is the human rating of $y_i$, and $z_i$ is the corresponding human-provided hindsight feedback. Assume the feedback tuples are ranked by reward, $r_1 \geq r_2 \geq \cdots \geq r_n$. The process is supervised fine-tuning where the data is a sequence in the form of $(x, y_1, z_1), (x, y_2, z_2), \ldots, (x, y_n, z_n)$, where $y_1$ is the completion with the highest reward.
+Algumas escolhas comuns de algoritmos ANN para MIPS rápido:
+
+- **[LSH](https://en.wikipedia.org/wiki/Locality-sensitive_hashing)** (Locality-Sensitive Hashing): Introduz uma função de hashing tal que itens de entrada semelhantes são mapeados para os mesmos buckets com alta probabilidade, onde o número de buckets é muito menor que o número de entradas.
+- **[ANNOY](https://github.com/spotify/annoy)**(Approximate Nearest Neighbors Oh Yeah): A estrutura de dados principal são árvores de projeção aleatória, um conjunto de árvores binárias onde cada nó não-folha representa um hiperplano dividindo o espaço de entrada pela metade e cada folha armazena um ponto de dados. As árvores são construídas de forma independente e aleatória, então, até certo ponto, imitam uma função de hashing. A busca ANNOY ocorre em todas as árvores para iterativamente buscar através da metade mais próxima da consulta e depois agrega os resultados. A ideia está bastante relacionada à árvore KD, mas é muito mais escalável.
+- **[HNSW](https://arxiv.org/abs/1603.09320)** (Hierarchical Navigable Small World): É inspirado na ideia de redes de pequenos mundos, onde a maioria dos nós pode ser alcançada por qualquer outro nó em um pequeno número de passos; por exemplo, a característica "seis graus de separação" das redes sociais. HNSW constrói camadas hierárquicas dessas grafos de pequenos mundos, onde as camadas inferiores contêm os pontos de dados reais. As camadas intermediárias criam atalhos para acelerar a busca. Ao realizar uma busca, HNSW começa de um nó aleatório na camada superior e navega em direção ao alvo. Quando não pode chegar mais perto, desce para a próxima camada, até alcançar a camada inferior. Cada movimento nas camadas superiores pode potencialmente cobrir uma grande distância no espaço de dados, e cada movimento nas camadas inferiores refina a qualidade da busca.
+- **[FAISS](https://github.com/facebookresearch/faiss)** (Facebook AI Similarity Search): Opera com a suposição de que, em um espaço de alta dimensão, as distâncias entre nós seguem uma distribuição Gaussiana e, portanto, deve existir um agrupamento de pontos de dados. FAISS aplica quantização vetorial, particionando o espaço vetorial em clusters e, em seguida, refinando a quantização dentro dos clusters. A busca primeiro procura candidatos a clusters com quantização grosseira e depois examina cada cluster com quantização mais fina.
+- **[ScaNN](https://github.com/google-research/google-research/tree/master/scann)** (Scalable Nearest Neighbors): A principal inovação no ScaNN é a quantização vetorial anisotrópica. Ele quantiza um ponto de dados \( \mathbf{x}_i \) para \( \mathbf{\tilde{x}}_i \) de modo que o produto interno (\( \ q, \mathbf{x}_i \)) seja o mais semelhante possível à distância original de \( \angle q, \mathbf{\tilde{x}}_i \) em vez de escolher os pontos centroids de quantização mais próximos.
+
+<img src = 'image9.png'>
+
+Fig. 9. Comparação de algoritmos MIPS, medida em recall@10. (Fonte da imagem: [Google Blog, 2020](https://ai.googleblog.com/2020/07/announcing-scann-efficient-vector.html)) 
+
+Confira mais algoritmos MIPS e comparação de desempenho em ann-benchmarks.com.
+
+## Componente Três: Uso de Ferramentas
