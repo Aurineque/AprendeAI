@@ -2,7 +2,7 @@
 
 Sumário - Falta fazer
 
-Construir agentes com LLM (grande modelo de linguagem) como controlador principal é um conceito interessante. Existem várias demonstrações de prova de conceito, como AutoGPT, GPT-Engineer e BabyAGI, que servem como exemplos inspiradores. A potencialidade do LLM vai além da boa geração de cópias, histórias, ensaios e programas; pode ser enquadrado como um poderoso solucionador de problemas gerais.
+Construir agentes com LLM (ingl., grande modelo de linguagem) como controlador principal é um conceito interessante. Existem várias demonstrações de prova de conceito, como [AutoGPT](https://github.com/Significant-Gravitas/Auto-GPT), [GPT-Engineer](https://github.com/AntonOsika/gpt-engineer) e [BabyAGI](https://github.com/yoheinakajima/babyagi), que servem como exemplos inspiradores. A potencialidade do LLM vai além da boa geração de cópias, histórias, ensaios e programas; pode ser enquadrado como um poderoso solucionador de problemas gerais.
 
 ## Visão geral do sistema do agente
 
@@ -16,7 +16,7 @@ Em um sistema de agente autônomo alimentado por LLM, o LLM funciona como o cér
 ####
 - Memória
     ####
-   - Memória de curto prazo: eu consideraria todo o aprendizado no contexto (consulte Prompt Engineering) como uma utilização da memória de curto prazo do modelo para aprender.
+   - Memória de curto prazo: eu consideraria todo o aprendizado no contexto (consulte [Prompt Engineering](https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/)) como uma utilização da memória de curto prazo do modelo para aprender.
     ####
   - Memória de longo prazo: fornece ao agente a capacidade de reter e recuperar informações (infinitas) por longos períodos, muitas vezes aproveitando um armazenamento de vetores externo e uma recuperação rápida. 
 ####
@@ -35,11 +35,11 @@ Uma tarefa complicada geralmente envolve muitas etapas. Um agente precisa saber 
 
 [A cadeia de pensamento](https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/#chain-of-thought-cot) (CoT; [Wei et al. 2022](https://arxiv.org/abs/2201.11903)) tornou-se uma técnica de prompt padrão para melhorar o desempenho do modelo em tarefas complexas. O modelo é instruído a “pensar passo a passo” para utilizar mais computação em tempo de teste para decompor tarefas difíceis em etapas menores e mais simples. CoT transforma grandes tarefas em múltiplas tarefas gerenciáveis ​​e esclarece uma interpretação do processo de pensamento do modelo. 
 
-Árvore de pensamentos ([Yao et al. 2023](https://arxiv.org/abs/2305.10601)) estende o CoT explorando múltiplas possibilidades de raciocínio em cada etapa. Primeiro, ele decompõe o problema em várias etapas de pensamento e gera vários pensamentos por etapa, criando uma estrutura em árvore. O processo de pesquisa pode ser BFS (pesquisa em largura) ou DFS (pesquisa em profundidade) com cada estado avaliado por um classificador (por meio de um prompt) ou voto majoritário. 
+Árvore de pensamentos ([Yao et al. 2023](https://arxiv.org/abs/2305.10601)) estende o CoT explorando múltiplas possibilidades de raciocínio em cada etapa. Primeiro, ele decompõe o problema em várias etapas de pensamento e gera vários pensamentos por etapa, criando uma estrutura em árvore. O processo de pesquisa pode ser BFS(ingl., pesquisa em largura) ou DFS(ingl., pesquisa em profundidade) com cada estado avaliado por um classificador (por meio de um prompt) ou voto majoritário. 
 
 A decomposição da tarefa pode ser feita (1) pelo LLM com solicitações simples como "Etapas para XYZ?", "Quais são os sub-objetivos para alcançar XYZ?", (2) usando instruções específicas da tarefa; por exemplo. "Escreva um esboço da história." para escrever um romance, ou (3) com contribuições humanas.
 
-Outra abordagem bastante distinta, LLM+P (Liu et al. 2023), envolve contar com um planejador clássico externo para fazer o planejamento de longo prazo. Esta abordagem utiliza a Linguagem de Definição de Domínio de Planejamento (PDDL) como uma interface intermediária para descrever o problema de planejamento. Neste processo, o LLM (1) traduz o problema em “Problema PDDL”, então (2) solicita a um planejador clássico para gerar um plano PDDL baseado em um “PDDL de domínio” existente e, finalmente, (3) traduz o plano PDDL de volta para linguagem natural. Essencialmente, a etapa de planejamento é terceirizada para uma ferramenta externa, assumindo a disponibilidade de PDDL específico do domínio e um planejador adequado, o que é comum em certas configurações robóticas, mas não em muitos outros domínios.
+Outra abordagem bastante distinta, LLM+P ([Liu et al. 2023](https://arxiv.org/abs/2304.11477)), envolve contar com um planejador clássico externo para fazer o planejamento de longo prazo. Esta abordagem utiliza a Linguagem de Definição de Domínio de Planejamento (PDDL, ingl.) como uma interface intermediária para descrever o problema de planejamento. Neste processo, o LLM (1) traduz o problema em “Problema PDDL”, então (2) solicita a um planejador clássico para gerar um plano PDDL baseado em um “PDDL de domínio” existente e, finalmente, (3) traduz o plano PDDL de volta para linguagem natural. Essencialmente, a etapa de planejamento é terceirizada para uma ferramenta externa, assumindo a disponibilidade de PDDL específico do domínio e um planejador adequado, o que é comum em certas configurações robóticas, mas não em muitos outros domínios.
 
 ### Auto-reflexão
 
@@ -60,7 +60,7 @@ Fig. 2. Exemplos de trajetórias de raciocínio para tarefas intensivas em conhe
 
 Em ambos os experimentos sobre tarefas intensivas em conhecimento e tarefas de tomada de decisão, o ReAct apresenta um desempenho melhor do que a linha de base apenas com Ação, onde o passo Pensamento: … é removido.
 
-Reflexão ([Shinn & Labash 2023](https://arxiv.org/abs/2303.11366)) é uma estrutura que equipa agentes com memória dinâmica e capacidades de auto-reflexão para melhorar habilidades de raciocínio. O Reflexão tem uma configuração padrão de RL, na qual o modelo de recompensa fornece uma recompensa binária simples e o espaço de ação segue a configuração do ReAct, onde o espaço de ação específico da tarefa é aumentado com linguagem para permitir passos de raciocínio complexos. Após cada ação \( a \), o agente calcula uma heurística \( h \) e opcionalmente pode decidir redefinir o ambiente para iniciar um novo teste, dependendo dos resultados da auto-reflexão.
+Reflexão ([Shinn & Labash 2023](https://arxiv.org/abs/2303.11366)) é uma estrutura que equipa agentes com memória dinâmica e capacidades de auto-reflexão para melhorar habilidades de raciocínio. O Reflexão tem uma configuração padrão de RL(ingl., aprendizagem por reforço), na qual o modelo de recompensa fornece uma recompensa binária simples e o espaço de ação segue a configuração do ReAct, onde o espaço de ação específico da tarefa é aumentado com linguagem para permitir passos de raciocínio complexos. Após cada ação \( a \), o agente calcula uma heurística \( h \) e opcionalmente pode decidir redefinir o ambiente para iniciar um novo teste, dependendo dos resultados da auto-reflexão.
 
 <img src = 'image3.png'>
 
@@ -84,7 +84,7 @@ O conjunto de dados de treinamento em seus experimentos é uma combinação de [
 
 Fig. 5. Após o ajuste fino com CoH, o modelo pode seguir instruções para produzir saídas com melhorias incrementais em uma sequência. (Fonte da imagem: [Liu et al. 2023](https://arxiv.org/abs/2302.02676))
 
-A ideia do CoH é apresentar um histórico de saídas melhoradas sequencialmente no contexto e treinar o modelo para seguir a tendência e produzir saídas melhores. O **Algorithm Distillation** (AD; [Laskin et al. 2023](https://arxiv.org/abs/2210.14215)) aplica a mesma ideia às trajetórias entre episódios em tarefas de aprendizado por reforço, onde um algoritmo é encapsulado em uma política condicionada por um longo histórico. Considerando que um agente interage com o ambiente muitas vezes e em cada episódio o agente melhora um pouco, o AD concatena esse histórico de aprendizado e o alimenta no modelo. Portanto, devemos esperar que a próxima ação prevista leve a um desempenho melhor do que os testes anteriores. O objetivo é aprender o processo de RL em vez de treinar uma política específica para a tarefa em si.
+A ideia do CoH é apresentar um histórico de saídas melhoradas sequencialmente no contexto e treinar o modelo para seguir a tendência e produzir saídas melhores. O **Algorithm Distillation** (AD; [Laskin et al. 2023](https://arxiv.org/abs/2210.14215)) aplica a mesma ideia às trajetórias entre episódios em tarefas de aprendizado por reforço, onde um algoritmo é encapsulado em uma política condicionada por um longo histórico. Considerando que um agente interage com o ambiente muitas vezes e em cada episódio o agente melhora um pouco, o AD concatena esse histórico de aprendizado e o alimenta no modelo. Portanto, devemos esperar que a próxima ação prevista leve a um desempenho melhor do que os testes anteriores. O objetivo é aprender o processo de RL(ingl., aprendizagem por reforço) em vez de treinar uma política específica para a tarefa em si.
 
 <img src = 'image6.png'>
 
@@ -145,6 +145,6 @@ Algumas escolhas comuns de algoritmos ANN para MIPS rápido:
 
 Fig. 9. Comparação de algoritmos MIPS, medida em recall@10. (Fonte da imagem: [Google Blog, 2020](https://ai.googleblog.com/2020/07/announcing-scann-efficient-vector.html)) 
 
-Confira mais algoritmos MIPS e comparação de desempenho em ann-benchmarks.com.
+Confira mais algoritmos MIPS e comparação de desempenho em [ann-benchmarks.com](https://ann-benchmarks.com/).
 
 ## Componente Três: Uso de Ferramentas
