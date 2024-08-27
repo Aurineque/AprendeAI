@@ -1,6 +1,19 @@
 # LLM Powered Autonomous Agents (Agentes Autônomos alimentados por LLM)
 
-Sumário - Falta fazer
+Este artigo trata-se de uma tradução realizada por Aurineque da Costa, aluno da Universidade Federal Rural de Pernambuco, como uma iniciativa do projeto de extensão Aprende.ai
+
+Link para artigo original em Inglês: https://lilianweng.github.io/posts/2023-06-23-agent/#component-two-memory
+
+## Sumário
+
+- [Visão geral do sistema do agente](#visão-geral-do-sistema-do-agente)
+- [Primeiro componente: Planejamento](#primeiro-componente-planejamento)
+  - [Decomposição de Tarefas](#decomposição-de-tarefas)
+  - [Auto-reflexão](#auto-reflexão)
+- [Componente Dois: Memória](#componente-dois-memória)
+  - [Tipos de Memória](#tipos-de-memória)
+  - [Pesquisa de Máximo Produto Interno (MIPS)](#pesquisa-de-máximo-produto-interno-mips)
+- [Componente Três: Uso de Ferramentas](#componente-três-uso-de-ferramentas)
 
 Construir agentes com LLM (ingl., grande modelo de linguagem) como controlador principal é um conceito interessante. Existem várias demonstrações de prova de conceito, como [AutoGPT](https://github.com/Significant-Gravitas/Auto-GPT), [GPT-Engineer](https://github.com/AntonOsika/gpt-engineer) e [BabyAGI](https://github.com/yoheinakajima/babyagi), que servem como exemplos inspiradores. A potencialidade do LLM vai além da boa geração de cópias, histórias, ensaios e programas; pode ser enquadrado como um poderoso solucionador de problemas gerais.
 
@@ -50,8 +63,11 @@ ReAct ([Yao et al. 2023](https://arxiv.org/abs/2210.03629)) integra raciocínio 
 O modelo de prompt ReAct incorpora etapas explícitas para o LLM pensar, formatadas aproximadamente como:
 
 Pensamento: ...
+
 Ação: ...
+
 Observação: ...
+
 ... (Repetido várias vezes)
 
 <img src = 'image2.png'>
@@ -148,3 +164,5 @@ Fig. 9. Comparação de algoritmos MIPS, medida em recall@10. (Fonte da imagem: 
 Confira mais algoritmos MIPS e comparação de desempenho em [ann-benchmarks.com](https://ann-benchmarks.com/).
 
 ## Componente Três: Uso de Ferramentas
+
+
