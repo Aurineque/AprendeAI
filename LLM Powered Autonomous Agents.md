@@ -165,4 +165,9 @@ Confira mais algoritmos MIPS e comparação de desempenho em [ann-benchmarks.com
 
 ## Componente Três: Uso de Ferramentas
 
+O uso de ferramentas é uma característica notável e distintiva dos seres humanos. Nós criamos, modificamos e utilizamos objetos externos para realizar tarefas que vão além dos nossos limites físicos e cognitivos. Equipar LLMs com ferramentas externas pode ampliar significativamente as capacidades do modelo.
+
+<img src = 'image10.png'>
+
+Fig. 10. Uma imagem de uma lontra-marinha usando uma pedra para abrir uma concha, enquanto flutua na água. Embora alguns outros animais possam usar ferramentas, a complexidade não é comparável à dos humanos. (Fonte da imagem: [Animais usando ferramentas](https://www.popularmechanics.com/science/animals/g39714258/animals-using-tools/))
 
